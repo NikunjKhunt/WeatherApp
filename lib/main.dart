@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:weatherapp/ui/splash_screen.dart';
+import 'package:weatherapp/utils/colors.dart';
 import 'package:weatherapp/utils/routes.dart';
 
 void main() {
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: black,
       ),
       routes: routes,
       initialRoute: SplashScreen.route,

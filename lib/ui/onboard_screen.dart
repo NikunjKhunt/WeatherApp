@@ -22,16 +22,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              color1,
-              color2,
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
+        decoration: gradientBackground(),
         child: Column(
           children: [
             Expanded(
@@ -65,7 +56,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       "Planing your trip become more easier with ideate weather app. you can instantly see the whole word weather within few second",
                     ),
                     const Spacer(),
-                    button("Get Started", onTap: () => Navigator.pushNamed(context, SignUpScreen.route)),
+                    gradientButton("Get Started", onTap: () => Navigator.pushNamed(context, SignUpScreen.route)),
                     Container(
                       padding: EdgeInsets.only(left: 20, right: 20, top: 20),
                       child: /*RichText(
