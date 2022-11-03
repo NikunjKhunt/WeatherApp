@@ -30,29 +30,36 @@ class DayScreen extends StatelessWidget {
       padding: EdgeInsets.all(Cons.space),
       child: Column(
         children: [
-          InkWell(
-            onTap: () => _showDialog(context),
-            child: Row(
-              children: [
-                Image.asset(
-                  "assets/images/ic_location.webp",
-                  height: 25,
+          Row(
+            children: [
+              Row(
+                children: [
+                  Image.asset(
+                    "assets/images/ic_location.webp",
+                    height: 25,
+                  ),
+                  hSpace(width: 8),
+                  header("text", color: Colors.white, fontSize: 25),
+                  hSpace(width: 8),
+                  Icon(
+                    Icons.keyboard_arrow_down_outlined,
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+              Spacer(),
+              InkWell(
+                onTap: () => showLogoutDialog(context),
+                child: Container(
+                  height: 35,
+                  width: 35,
+                  padding: EdgeInsets.all(5),
+                  child: Image.asset(
+                    "assets/images/ic_logout.webp",
+                  ),
                 ),
-                hSpace(width: 8),
-                header("text", color: Colors.white, fontSize: 25),
-                hSpace(width: 8),
-                Icon(
-                  Icons.keyboard_arrow_down_outlined,
-                  color: Colors.white,
-                ),
-                Spacer(),
-                Image.asset(
-                  "assets/images/ic_logout.webp",
-                  height: 22,
-                ),
-                hSpace(),
-              ],
-            ),
+              ),
+            ],
           ),
           Flexible(
             child: Image.asset(
@@ -98,34 +105,6 @@ class DayScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _showDialog(BuildContext context) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('AlertDialog Title'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: const <Widget>[
-                Text('This is a demo alert dialog.'),
-                Text('Would you like to approve of this message?'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Approve'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-  
   _weatherDetail(String title, String value) {
     return Container(
       padding: const EdgeInsets.all(4),
@@ -142,5 +121,169 @@ class DayScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  showLogoutDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(35.0))),
+            contentPadding: EdgeInsets.only(top: 10.0),
+            content: Container(
+              width: 300.0,
+              padding: EdgeInsets.all(Cons.space),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  ClipOval(
+                    child: Container(
+                      height: 120,
+                      width: 120,
+                      padding: EdgeInsets.all(20),
+                      color: lightRedColor,
+                      child: Image.asset(
+                        "assets/images/ic_logout.webp",
+                      ),
+                    ),
+                  ),
+                  vSpace(height: 24),
+                  header("Logout"),
+                  vSpace(height: 8),
+                  subHeader("Are you sure you want to logout from app", isCenter: true, color: subTextColor),
+                  vSpace(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: 50,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          color: redColor,
+                            border: Border.all(
+                              color: redColor,
+                            ),
+                            borderRadius: BorderRadius.all(Radius.circular(15))
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Logout",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.white,fontSize: 18,fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                      hSpace(),
+                      Container(
+                        height: 50,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          color: negativeButtonColor,
+                            border: Border.all(
+                              color: negativeButtonColor,
+                            ),
+                            borderRadius: BorderRadius.all(Radius.circular(15))
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Cancel",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                      // button("Logout", onTap: (){},bgColor: redColor,textColor: Colors.white),
+                      // button("Cancel", onTap: (){},bgColor: negativeButtonColor),
+                    ],
+                  ),
+                  vSpace(height: 8),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  showCityDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(35.0))),
+            contentPadding: EdgeInsets.only(top: 10.0),
+            content: Container(
+              width: 300.0,
+              padding: EdgeInsets.all(Cons.space),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  ClipOval(
+                    child: Container(
+                      height: 120,
+                      width: 120,
+                      padding: EdgeInsets.all(20),
+                      color: lightRedColor,
+                      child: Image.asset(
+                        "assets/images/ic_logout.webp",
+                      ),
+                    ),
+                  ),
+                  vSpace(height: 24),
+                  header("Logout"),
+                  vSpace(height: 8),
+                  subHeader("Are you sure you want to logout from app", isCenter: true, color: subTextColor),
+                  vSpace(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: 50,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          color: redColor,
+                            border: Border.all(
+                              color: redColor,
+                            ),
+                            borderRadius: BorderRadius.all(Radius.circular(15))
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Logout",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.white,fontSize: 18,fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                      hSpace(),
+                      Container(
+                        height: 50,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          color: negativeButtonColor,
+                            border: Border.all(
+                              color: negativeButtonColor,
+                            ),
+                            borderRadius: BorderRadius.all(Radius.circular(15))
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Cancel",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                      // button("Logout", onTap: (){},bgColor: redColor,textColor: Colors.white),
+                      // button("Cancel", onTap: (){},bgColor: negativeButtonColor),
+                    ],
+                  ),
+                  vSpace(height: 8),
+                ],
+              ),
+            ),
+          );
+        });
   }
 }

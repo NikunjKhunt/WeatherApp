@@ -31,12 +31,15 @@ subHeader(
   text, {
   double fontSize = 17,
   isBold = false,
+  isCenter = false,
+      Color color = Colors.grey,
 }) =>
     header(
       text,
-      color: Colors.grey,
+      color: color,
       fontSize: fontSize,
       isBold: isBold,
+      isCenter: isCenter,
     );
 
 gradientBackground() => const BoxDecoration(
@@ -50,9 +53,9 @@ gradientBackground() => const BoxDecoration(
       ),
     );
 
-whiteBackgroundWithBorder()=>BoxDecoration(
+whiteBackgroundWithBorder() => BoxDecoration(
     color: Colors.white.withAlpha(75), borderRadius: BorderRadius.all(Radius.circular(20)), border: Border.all(color: whiteColor70, width: 2)
-  /*boxShadow: <BoxShadow>[
+    /*boxShadow: <BoxShadow>[
                 BoxShadow(
                   color: Colors.black,
                   blurRadius: 0.0,
@@ -60,7 +63,8 @@ whiteBackgroundWithBorder()=>BoxDecoration(
                   offset: new Offset(2.0, 0.0),
                 ),
               ]*/
-);
+    );
+
 gradientButton(
   text, {
   required Function()? onTap,
@@ -115,7 +119,7 @@ button(
   Color textColor = buttonTextColor,
   Color bgColor = Colors.white,
   double height = 50,
-    double  horizontalMargin = 0,
+  double horizontalMargin = 0,
 }) =>
     Container(
       height: height,
