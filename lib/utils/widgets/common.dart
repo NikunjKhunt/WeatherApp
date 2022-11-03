@@ -38,15 +38,28 @@ subHeader(
       fontSize: fontSize,
       isBold: isBold,
     );
-gradientBackground()=>const BoxDecoration(
-  gradient: LinearGradient(
-    colors: [
-      color1,
-      color2,
-    ],
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-  ),
+
+gradientBackground() => const BoxDecoration(
+      gradient: LinearGradient(
+        colors: [
+          color1,
+          color2,
+        ],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+      ),
+    );
+
+whiteBackgroundWithBorder()=>BoxDecoration(
+    color: Colors.white.withAlpha(75), borderRadius: BorderRadius.all(Radius.circular(20)), border: Border.all(color: whiteColor70, width: 2)
+  /*boxShadow: <BoxShadow>[
+                BoxShadow(
+                  color: Colors.black,
+                  blurRadius: 0.0,
+                  spreadRadius: -2,
+                  offset: new Offset(2.0, 0.0),
+                ),
+              ]*/
 );
 gradientButton(
   text, {
@@ -93,27 +106,31 @@ gradientButton(
             )),
       ),
     );
+
 button(
   text, {
+  Icon? icon,
   required Function()? onTap,
   double fontSize = 22,
   Color textColor = buttonTextColor,
   Color bgColor = Colors.white,
   double height = 50,
+    double  horizontalMargin = 0,
 }) =>
     Container(
       height: height,
+      margin: EdgeInsets.symmetric(horizontal: horizontalMargin),
       decoration: BoxDecoration(
-              color: bgColor,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey,
-                  offset: Offset(0.0, 1.5),
-                  blurRadius: 15,
-                ),
-              ],
-              borderRadius: BorderRadius.all(Radius.circular(15)),
-            ),
+        color: bgColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey,
+            offset: Offset(0.0, 1.5),
+            blurRadius: 15,
+          ),
+        ],
+        borderRadius: BorderRadius.all(Radius.circular(15)),
+      ),
       child: Material(
         color: Colors.transparent,
         shape: const RoundedRectangleBorder(
@@ -122,9 +139,15 @@ button(
         child: InkWell(
             onTap: onTap,
             child: Center(
-              child: Text(
-                '$text',
-                style: TextStyle(color: textColor, fontSize: fontSize),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '$text',
+                    style: TextStyle(color: textColor, fontSize: fontSize),
+                  ),
+                  if (icon != null) icon,
+                ],
               ),
             )),
       ),
@@ -173,4 +196,5 @@ space({double height = 0, double width = 0}) => SizedBox(
     );
 
 vSpace({double height = Cons.space}) => space(height: height);
+
 hSpace({double width = Cons.space}) => space(width: width);

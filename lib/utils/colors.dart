@@ -14,18 +14,18 @@ const secondSuccessColor = Color(0xFF474F5A);
 const secondButtonColor = Color(0xFFD9D9D9);
 
 const MaterialColor black = MaterialColor(
-  _redPrimaryValue,
+  _primaryValue,
   <int, Color>{
     50: Colors.black12,
     100: Colors.black26,
     200: Colors.black38,
     300: Colors.black38,
     400: Colors.black45,
-    500: Color(_redPrimaryValue),
+    500: Color(_primaryValue),
     600: Colors.black54,
     700: Colors.black54,
     800: Colors.black87,
     900: Colors.black87,
   },
 );
-const int _redPrimaryValue = 0xFF000000;
+const int _primaryValue = 0xFF000000;
