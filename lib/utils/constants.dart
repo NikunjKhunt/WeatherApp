@@ -3,6 +3,17 @@ import 'package:flutter/foundation.dart';
 
 class Cons{
   static const double space = 16;
+  static const String baseURL = "https://hiring-test.a2dweb.com/";
+
+  //POST
+  static const String create_user = "create-user";
+  static const String login = "login";
+
+  //GET
+  static const String city_list = "city-list";
+  static const String view_small_forecast = "view-small-forecast";
+  static const String view_other_forecast = "view-other-forecast";
+  static const String live_weather = "live-weather";
 }
 
 enum WeatherType{
