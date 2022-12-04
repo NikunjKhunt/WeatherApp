@@ -105,7 +105,7 @@ class ApiWrapper {
       "Device-Identifier": uniqueKey,
     };
     if (isAuthRequired != null && isAuthRequired) {
-      headers["Authorization"] = (passportToken != null && passportToken.isNotEmpty) ? passportToken : await SharedPref.getUserAuthKey();
+      headers["Authorization"] = (passportToken != null && passportToken.isNotEmpty) ? passportToken : "Bearer ${await SharedPref.getAccessToken()}";
     }
     return headers;
   }

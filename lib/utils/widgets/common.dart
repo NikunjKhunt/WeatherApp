@@ -32,7 +32,7 @@ subHeader(
   double fontSize = 17,
   isBold = false,
   isCenter = false,
-      Color color = Colors.grey,
+  Color color = Colors.grey,
 }) =>
     header(
       text,
@@ -67,6 +67,7 @@ whiteBackgroundWithBorder() => BoxDecoration(
 
 gradientButton(
   text, {
+  isLoading = false,
   required Function()? onTap,
   double fontSize = 22,
   Color color = Colors.white,
@@ -101,12 +102,16 @@ gradientButton(
           borderRadius: BorderRadius.all(Radius.circular(15)),
         ),
         child: InkWell(
-            onTap: onTap,
+            onTap: isLoading ? null : onTap,
             child: Center(
-              child: Text(
-                '$text',
-                style: TextStyle(color: color, fontSize: fontSize),
-              ),
+              child: (isLoading)
+                  ? CircularProgressIndicator(
+                      color: Colors.white,
+                    )
+                  : Text(
+                      '$text',
+                      style: TextStyle(color: color, fontSize: fontSize),
+                    ),
             )),
       ),
     );

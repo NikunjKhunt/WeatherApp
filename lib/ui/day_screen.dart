@@ -1,20 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
+import 'package:weatherapp/notifiers/home_notifier.dart';
+import 'package:weatherapp/ui/signin_screen.dart';
 import 'package:weatherapp/ui/weather_screen.dart';
 import 'package:weatherapp/utils/constants.dart';
 import 'package:weatherapp/utils/extentions.dart';
+import 'package:weatherapp/utils/shared_pref.dart';
 import 'package:weatherapp/utils/widgets/common.dart';
 
 import '../utils/colors.dart';
 import '../utils/widgets/shadow_text.dart';
 
-class DayScreen extends StatelessWidget {
+class DayScreen extends StatefulWidget {
   static const String route = "/day-screen";
-
-  final WeatherType weather = WeatherType.cloudy;
 
   const DayScreen({Key? key}) : super(key: key);
 
+  @override
+  State<DayScreen> createState() => _DayScreenState();
+}
+
+class _DayScreenState extends State<DayScreen> {
+  late HomeNotifier homeNotifier;
+  final WeatherType weather = WeatherType.cloudy;
+
+  @override
+  void initState() {
+    super.initState();
+    homeNotifier = Provider.of<HomeNotifier>(context, listen: false);
+  }
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -156,40 +171,46 @@ class DayScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        height: 50,
-                        width: 100,
-                        decoration: BoxDecoration(
-                          color: redColor,
-                            border: Border.all(
-                              color: redColor,
+                      InkWell(
+                        onTap: _doLogout,
+                        child: Container(
+                          height: 50,
+                          width: 100,
+                          decoration: BoxDecoration(
+                            color: redColor,
+                              border: Border.all(
+                                color: redColor,
+                              ),
+                              borderRadius: BorderRadius.all(Radius.circular(15))
+                          ),
+                          child: const Center(
+                            child: Text(
+                              "Logout",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.white,fontSize: 18,fontWeight: FontWeight.bold),
                             ),
-                            borderRadius: BorderRadius.all(Radius.circular(15))
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Logout",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white,fontSize: 18,fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
                       hSpace(),
-                      Container(
-                        height: 50,
-                        width: 100,
-                        decoration: BoxDecoration(
-                          color: negativeButtonColor,
-                            border: Border.all(
-                              color: negativeButtonColor,
+                      InkWell(
+                        onTap: () => Navigator.of(context).pop(),
+                        child: Container(
+                          height: 50,
+                          width: 100,
+                          decoration: BoxDecoration(
+                            color: negativeButtonColor,
+                              border: Border.all(
+                                color: negativeButtonColor,
+                              ),
+                              borderRadius: BorderRadius.all(Radius.circular(15))
+                          ),
+                          child: const Center(
+                            child: Text(
+                              "Cancel",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.bold),
                             ),
-                            borderRadius: BorderRadius.all(Radius.circular(15))
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Cancel",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -210,8 +231,8 @@ class DayScreen extends StatelessWidget {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(35.0))),
-            contentPadding: EdgeInsets.only(top: 10.0),
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(35.0))),
+            contentPadding: const EdgeInsets.only(top: 10.0),
             content: Container(
               width: 300.0,
               padding: EdgeInsets.all(Cons.space),
@@ -246,9 +267,9 @@ class DayScreen extends StatelessWidget {
                             border: Border.all(
                               color: redColor,
                             ),
-                            borderRadius: BorderRadius.all(Radius.circular(15))
+                            borderRadius: const BorderRadius.all(Radius.circular(15))
                         ),
-                        child: Center(
+                        child: const Center(
                           child: Text(
                             "Logout",
                             textAlign: TextAlign.center,
@@ -265,9 +286,9 @@ class DayScreen extends StatelessWidget {
                             border: Border.all(
                               color: negativeButtonColor,
                             ),
-                            borderRadius: BorderRadius.all(Radius.circular(15))
+                            borderRadius: const BorderRadius.all(Radius.circular(15))
                         ),
-                        child: Center(
+                        child: const Center(
                           child: Text(
                             "Cancel",
                             textAlign: TextAlign.center,
@@ -285,5 +306,11 @@ class DayScreen extends StatelessWidget {
             ),
           );
         });
+  }
+
+  void _doLogout()  {
+    SharedPref.setToken("");
+    Navigator.of(context).pop();
+    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const SignInScreen(),), (route) => false);
   }
 }

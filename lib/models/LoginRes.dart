@@ -8,7 +8,7 @@ class LoginRes {
     _liveWeather = liveWeather;
 }
 
-  LoginRes.fromJson(dynamic json) {
+  LoginRes.fromJson(Map<String,dynamic> json) {
     _msg = json['msg'];
     _token = json['token'];
     _liveWeather = json['liveWeather'] != null ? LiveWeather.fromJson(json['liveWeather']) : null;
