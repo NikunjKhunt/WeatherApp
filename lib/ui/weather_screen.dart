@@ -1,33 +1,64 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
+import 'package:weatherapp/notifiers/weather_notifier.dart';
+import 'package:weatherapp/utils/colors.dart';
 import 'package:weatherapp/utils/constants.dart';
 import 'package:weatherapp/utils/extentions.dart';
 import 'package:weatherapp/utils/widgets/common.dart';
+import 'package:provider/provider.dart';
 
 class WeatherScreen extends StatefulWidget {
   static const String route = "/weather-screen";
-
-  const WeatherScreen({Key? key}) : super(key: key);
+  final String? cityId;
+  const WeatherScreen({Key? key,this.cityId}) : super(key: key);
 
   @override
   State<WeatherScreen> createState() => _WeatherScreenState();
 }
 
 class _WeatherScreenState extends State<WeatherScreen> {
+
+  DateTime now = DateTime.now();
+  late WeatherNotifier notifier;
+  @override
+  void initState() {
+    super.initState();
+    notifier = Provider.of<WeatherNotifier>(context, listen: false);
+    notifier.fetchData(widget.cityId!);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Scaffold(
-        body: _body(),
-      ),
-    );
+    return Scaffold(
+        body: ValueListenableBuilder<ApiStatus>(
+          valueListenable: notifier.progressBar,
+          builder: (context, value, child) {
+            return Stack(
+              children: [
+                _body(),
+                if (value == ApiStatus.processing)
+                  Container(
+                    height: double.infinity,
+                    width: double.infinity,
+                    color: whiteColor70,
+                    child: const Center(
+                      child: CircularProgressIndicator(
+                        color: color2,
+                      ),
+                    ),
+                  )
+              ],
+            );
+          },
+        ));
   }
 
   _body() {
     return Container(
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
-      padding: EdgeInsets.all(Cons.space),
+      padding: const EdgeInsets.all(Cons.space),
       decoration: gradientBackground(),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -59,11 +90,12 @@ class _WeatherScreenState extends State<WeatherScreen> {
               ),
             ],
           ),
+          if(notifier.smallWeatherData.isNotEmpty)
           SizedBox(
             height: 170,
             child: ListView(
               scrollDirection: Axis.horizontal,
-              children: List.generate(10, (index) => HWeatherItem(temp: "20", weatherType: "Sunny", time: "15")).toList(),
+              children: List.generate(10, (index) => HWeatherItem(temp: notifier.smallWeatherData["temperature"].toString(), weatherType: notifier.smallWeatherData["condition"], time: notifier.smallWeatherData["time"]/*DateFormat.jm().format(DateFormat.jm().parse().add(Duration(minutes: index*30)))*/)).toList(),
             ),
           ),
           vSpace(),
@@ -77,16 +109,28 @@ class _WeatherScreenState extends State<WeatherScreen> {
               ),
             ],
           ),
-          // SingleChildScrollView(child: Column(children: List.generate(10, (index) => VWeatherItem(temp: "20", weatherType: "Sunny", time: "15")).toList(),))
+          if(notifier.weatherData!=null)
           Flexible(
             child: SingleChildScrollView(
-              child: ListView.builder(
+              child: /*
+             TODO Had to remove cause of API Response
+
+              ListView.builder(
                   physics: NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
                   itemCount: 20,
                   itemBuilder: (context, index) {
                     return VWeatherItem(temp: "20", weatherType: "Sunny", time: "Sep, 13");
-                  }),
+                  })*/
+              Column(children: [
+                VWeatherItem(temp: notifier.weatherData!.day1!.temperature.toString(), weatherType: notifier.weatherData!.day1!.condition!, time: DateFormat("MMM, dd").format(now.add(Duration(days: 1)))),
+                VWeatherItem(temp: notifier.weatherData!.day2!.temperature.toString(), weatherType: notifier.weatherData!.day1!.condition!, time: DateFormat("MMM, dd").format(now.add(Duration(days: 2)))),
+                VWeatherItem(temp: notifier.weatherData!.day3!.temperature.toString(), weatherType: notifier.weatherData!.day1!.condition!, time: DateFormat("MMM, dd").format(now.add(Duration(days: 3)))),
+                VWeatherItem(temp: notifier.weatherData!.day4!.temperature.toString(), weatherType: notifier.weatherData!.day1!.condition!, time: DateFormat("MMM, dd").format(now.add(Duration(days: 4)))),
+                VWeatherItem(temp: notifier.weatherData!.day5!.temperature.toString(), weatherType: notifier.weatherData!.day1!.condition!, time: DateFormat("MMM, dd").format(now.add(Duration(days: 5)))),
+                VWeatherItem(temp: notifier.weatherData!.day6!.temperature.toString(), weatherType: notifier.weatherData!.day1!.condition!, time: DateFormat("MMM, dd").format(now.add(Duration(days: 6)))),
+                VWeatherItem(temp: notifier.weatherData!.day7!.temperature.toString(), weatherType: notifier.weatherData!.day1!.condition!, time: DateFormat("MMM, dd").format(now.add(Duration(days: 7)))),
+              ],),
             ),
           ),
         ],
@@ -147,10 +191,11 @@ class HWeatherItem extends StatelessWidget {
         children: [
           header(temp.toTemp(), color: Colors.white, isBold: false),
           Image.asset(
-            WeatherTypeHelpers.fromDisplayName("Cloudy")?.icon ?? "",
+            WeatherTypeHelpers.fromAlias(weatherType)?.icon ?? WeatherType.cloudy.icon,
             height: 75,
           ),
-          header(time, color: Colors.white, isBold: false),
+          Padding(padding: EdgeInsets.all(5),child:
+          header(time, color: Colors.white, isBold: false,fontSize: 20),),
         ],
       ),
     );
@@ -166,13 +211,14 @@ class VWeatherItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(WeatherTypeHelpers.fromAlias(weatherType)?.icon);
     return Container(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           header(time, color: Colors.white, isBold: false),
           Image.asset(
-            WeatherTypeHelpers.fromDisplayName("Cloudy")?.icon ?? "",
+            WeatherTypeHelpers.fromAlias(weatherType)?.icon ?? WeatherType.cloudy.icon,
             height: 50,
           ),
           header(temp.toTemp(), color: Colors.white, isBold: false),

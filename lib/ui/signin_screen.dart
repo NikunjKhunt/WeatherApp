@@ -17,9 +17,7 @@ class SignInScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SignInForm(),
-    );
+    return const SignInForm();
   }
 
   _success(double screenWidth) {
@@ -74,44 +72,49 @@ class _SignInFormState extends State<SignInForm> {
     return ValueListenableBuilder<bool>(
       valueListenable: loginNotifier.isProgressing,
       builder: (context, value, child) {
-        return Container(
-          padding: EdgeInsets.all(Cons.space),
-          child: Column(
-            children: [
-              Container(
-                margin: EdgeInsets.only(top: 50),
-                child: Column(
-                  children: [
-                    logo(size.width),
-                    header("Forcasting", fontSize: 30),
-                    vSpace(),
-                    subHeader("Enter your email address and password"),
-                  ],
-                ),
-              ),
-              _form(value),
-              // _success(size.width),
-              Spacer(),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
+        return Scaffold(
+          body: SingleChildScrollView(
+            child: Container(
+              height: size.height,
+              padding: const EdgeInsets.all(Cons.space),
+              child: Column(
                 children: [
-                  const Text(
-                    "Don't have an account? ",
-                    style: TextStyle(color: Colors.black, fontSize: 17),
+                  Container(
+                    margin: const EdgeInsets.only(top: 50),
+                    child: Column(
+                      children: [
+                        logo(size.width),
+                        header("Forcasting", fontSize: 30),
+                        vSpace(),
+                        subHeader("Enter your email address and password"),
+                      ],
+                    ),
                   ),
-                  GradientText(
-                    'Signup',
-                    style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                    gradient: const LinearGradient(colors: [
-                      color1,
-                      color2,
-                    ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
-                    onTap: () => Navigator.pushNamed(context, SignUpScreen.route),
-                  )
+                  _form(value),
+                  // _success(size.width),
+                  const Spacer(),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "Don't have an account? ",
+                        style: TextStyle(color: Colors.black, fontSize: 17),
+                      ),
+                      GradientText(
+                        'Signup',
+                        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                        gradient: const LinearGradient(colors: [
+                          color1,
+                          color2,
+                        ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+                        onTap: () => Navigator.pushNamed(context, SignUpScreen.route),
+                      )
+                    ],
+                  ),
                 ],
               ),
-            ],
+            ),
           ),
         );
       },
@@ -194,6 +197,7 @@ class _SignInFormState extends State<SignInForm> {
   _doLogin() async {
     if (_formKey.currentState!.validate()) {
       bool isSuccess = await loginNotifier.doLogin(emailAddress: _emailController.text, password: _passwordController.text);
+      if(!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(Provider.of<LoginNotifier>(context, listen: false).message),
@@ -201,7 +205,7 @@ class _SignInFormState extends State<SignInForm> {
         ),
       );
       if (isSuccess) {
-        Future.delayed(Duration(milliseconds: 250),() {
+        Future.delayed(const Duration(milliseconds: 250),() {
             Navigator.of(context).pushNamed(DayScreen.route);
         },);
       }

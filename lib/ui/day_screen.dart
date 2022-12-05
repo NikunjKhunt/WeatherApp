@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:weatherapp/models/City.dart';
 import 'package:weatherapp/notifiers/home_notifier.dart';
 import 'package:weatherapp/ui/signin_screen.dart';
 import 'package:weatherapp/ui/weather_screen.dart';
@@ -24,30 +26,85 @@ class DayScreen extends StatefulWidget {
 class _DayScreenState extends State<DayScreen> {
   late HomeNotifier homeNotifier;
   final WeatherType weather = WeatherType.cloudy;
+  String? _selectedCity;
 
   @override
   void initState() {
     super.initState();
     homeNotifier = Provider.of<HomeNotifier>(context, listen: false);
+    Future.delayed(const Duration(milliseconds: 0)).then((value) async {
+      _selectedCity = await SharedPref.getDefaultCity();
+      homeNotifier.fetchData(_selectedCity!);
+    });
   }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      body: _body(context, size),
-    );
+        body: ValueListenableBuilder<ApiStatus>(
+      valueListenable: homeNotifier.progressBar,
+      builder: (context, value, child) {
+        return Stack(
+          children: [
+            _body(context, size),
+            if (value == ApiStatus.processing)
+              Container(
+                height: double.infinity,
+                width: double.infinity,
+                color: whiteColor70,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: color2,
+                  ),
+                ),
+              )
+          ],
+        );
+      },
+    ));
   }
 
   _body(BuildContext context, Size size) {
     return Container(
-      margin: EdgeInsets.only(top: 32),
+      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.of(context).size.width,
       decoration: gradientBackground(),
       padding: EdgeInsets.all(Cons.space),
       child: Column(
         children: [
+          vSpace(height: 24),
           Row(
             children: [
-              Row(
+              ValueListenableBuilder<List<City>>(
+                valueListenable: homeNotifier.cityList,
+                builder: (context, value, child) {
+                  return DropdownButton<String>(
+                    value: _selectedCity,
+                    icon: const Icon(Icons.arrow_downward),
+                    elevation: 16,
+                    style: const TextStyle(color: Colors.deepPurple),
+                    underline: Container(
+                      height: 2,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    onChanged: (String? value) {
+                      // This is called when the user selects an item.
+                      setState(() {
+                        _selectedCity = value!;
+                      });
+                      _getWeather();
+                    },
+                    items: value.map<DropdownMenuItem<String>>((City value) {
+                      return DropdownMenuItem<String>(
+                        value: value.id,
+                        child: Text("${value.name} ${value.maxTemperature ?? ''}/${value.minTemperature ?? ''}"),
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
+              /*Row(
                 children: [
                   Image.asset(
                     "assets/images/ic_location.webp",
@@ -61,7 +118,7 @@ class _DayScreenState extends State<DayScreen> {
                     color: Colors.white,
                   ),
                 ],
-              ),
+              ),*/
               Spacer(),
               InkWell(
                 onTap: () => showLogoutDialog(context),
@@ -76,45 +133,7 @@ class _DayScreenState extends State<DayScreen> {
               ),
             ],
           ),
-          Flexible(
-            child: Image.asset(
-              weather.icon,
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.all(8),
-            width: double.infinity,
-            decoration: whiteBackgroundWithBorder(),
-            child: Column(
-              children: [
-                header("Today, 12 September", color: Colors.white, isBold: false),
-                ShadowText(
-                  '29'.toTemp(),
-                  style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.white, fontSize: 70),
-                ),
-                header(weather.displayName, color: Colors.white),
-                vSpace(),
-                _weatherDetail("Time", "06:00 AM"),
-                _weatherDetail("Time", "06:00 AM"),
-                _weatherDetail("Time", "06:00 AM"),
-                _weatherDetail("Time", "06:00 AM"),
-                _weatherDetail("Time", "06:00 AM"),
-                _weatherDetail("Time", "06:00 AM"),
-                _weatherDetail("Time", "06:00 AM"),
-              ],
-            ),
-          ),
-          vSpace(),
-          button(
-            "Forecast Report ",
-            icon: const Icon(
-              Icons.arrow_forward_ios_outlined,
-              size: 20,
-              color: buttonTextColor,
-            ),
-            horizontalMargin: 50,
-            onTap: () => Navigator.of(context).pushNamed(WeatherScreen.route),
-          )
+          ..._listData(),
         ],
       ),
     );
@@ -177,17 +196,16 @@ class _DayScreenState extends State<DayScreen> {
                           height: 50,
                           width: 100,
                           decoration: BoxDecoration(
-                            color: redColor,
+                              color: redColor,
                               border: Border.all(
                                 color: redColor,
                               ),
-                              borderRadius: BorderRadius.all(Radius.circular(15))
-                          ),
+                              borderRadius: BorderRadius.all(Radius.circular(15))),
                           child: const Center(
                             child: Text(
                               "Logout",
                               textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.white,fontSize: 18,fontWeight: FontWeight.bold),
+                              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
@@ -199,17 +217,16 @@ class _DayScreenState extends State<DayScreen> {
                           height: 50,
                           width: 100,
                           decoration: BoxDecoration(
-                            color: negativeButtonColor,
+                              color: negativeButtonColor,
                               border: Border.all(
                                 color: negativeButtonColor,
                               ),
-                              borderRadius: BorderRadius.all(Radius.circular(15))
-                          ),
+                              borderRadius: BorderRadius.all(Radius.circular(15))),
                           child: const Center(
                             child: Text(
                               "Cancel",
                               textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.bold),
+                              style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
@@ -263,17 +280,16 @@ class _DayScreenState extends State<DayScreen> {
                         height: 50,
                         width: 100,
                         decoration: BoxDecoration(
-                          color: redColor,
+                            color: redColor,
                             border: Border.all(
                               color: redColor,
                             ),
-                            borderRadius: const BorderRadius.all(Radius.circular(15))
-                        ),
+                            borderRadius: const BorderRadius.all(Radius.circular(15))),
                         child: const Center(
                           child: Text(
                             "Logout",
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white,fontSize: 18,fontWeight: FontWeight.bold),
+                            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -282,17 +298,16 @@ class _DayScreenState extends State<DayScreen> {
                         height: 50,
                         width: 100,
                         decoration: BoxDecoration(
-                          color: negativeButtonColor,
+                            color: negativeButtonColor,
                             border: Border.all(
                               color: negativeButtonColor,
                             ),
-                            borderRadius: const BorderRadius.all(Radius.circular(15))
-                        ),
+                            borderRadius: const BorderRadius.all(Radius.circular(15))),
                         child: const Center(
                           child: Text(
                             "Cancel",
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.bold),
+                            style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -308,9 +323,74 @@ class _DayScreenState extends State<DayScreen> {
         });
   }
 
-  void _doLogout()  {
+  void _doLogout() {
     SharedPref.setToken("");
     Navigator.of(context).pop();
-    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const SignInScreen(),), (route) => false);
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => const SignInScreen(),
+        ),
+        (route) => false);
+  }
+
+  void _getWeather() {
+    if (_selectedCity != null) {
+      homeNotifier.getCityWeather(_selectedCity!);
+    }
+  }
+
+  _listData() {
+    List<Widget> list = [];
+    if (_selectedCity == null) {
+      list.add(Expanded(
+          child: Center(
+        child: header("Please select a city", color: Colors.white, isBold: false),
+      )));
+    } else if (homeNotifier.weatherData != null) {
+      list.add(Flexible(
+        child: Image.asset(
+          homeNotifier.weatherData != null ? WeatherTypeHelpers.fromAlias(homeNotifier.weatherData!.condition!)!.icon : WeatherType.cloudy.icon,
+        ),
+      ));
+      list.add(Container(
+        padding: EdgeInsets.all(8),
+        width: double.infinity,
+        decoration: whiteBackgroundWithBorder(),
+        child: Column(
+          children: [
+            header("Today, ${DateFormat.yMMMd().format(DateTime.now())}", color: Colors.white, isBold: false),
+            ShadowText(
+              homeNotifier.weatherData!.temperature.toString().toTemp(),
+              style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.white, fontSize: 70),
+            ),
+            header(weather.displayName, color: Colors.white),
+            vSpace(),
+            _weatherDetail("Temperature", homeNotifier.weatherData!.temperature.toString().toTemp()),
+            _weatherDetail("MaxTemperature", homeNotifier.weatherData!.maxTemperature.toString().toTemp()),
+            _weatherDetail("MinTemperature", homeNotifier.weatherData!.minTemperature.toString().toTemp()),
+            _weatherDetail("Condition", homeNotifier.weatherData!.condition!),
+            _weatherDetail("WindSpeed", "${homeNotifier.weatherData!.windSpeed!} km/h"),
+            _weatherDetail("Humidity", "${homeNotifier.weatherData!.humidity!} %"),
+          ],
+        ),
+      ));
+      list.add(vSpace());
+      list.add(button(
+        "Forecast Report ",
+        icon: const Icon(
+          Icons.arrow_forward_ios_outlined,
+          size: 20,
+          color: buttonTextColor,
+        ),
+        horizontalMargin: 50,
+        onTap: () => Navigator.of(context).pushNamed(WeatherScreen.route, arguments: _selectedCity),
+      ));
+    } else {
+      list.add(Expanded(
+          child: Center(
+        child: header("No data available", color: Colors.white, isBold: false),
+      )));
+    }
+    return list;
   }
 }

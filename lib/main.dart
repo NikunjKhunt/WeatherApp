@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:weatherapp/notifiers/home_notifier.dart';
 import 'package:weatherapp/notifiers/login_notifier.dart';
+import 'package:weatherapp/notifiers/weather_notifier.dart';
+import 'package:weatherapp/ui/day_screen.dart';
+import 'package:weatherapp/ui/signin_screen.dart';
+import 'package:weatherapp/ui/signup_screen.dart';
 import 'package:weatherapp/ui/splash_screen.dart';
+import 'package:weatherapp/ui/weather_screen.dart';
 import 'package:weatherapp/utils/colors.dart';
 import 'package:weatherapp/utils/routes.dart';
 
@@ -20,6 +26,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => LoginNotifier()),
+        ChangeNotifierProvider(create: (context) => HomeNotifier()),
+        ChangeNotifierProvider(create: (context) => WeatherNotifier()),
       ],
       child: MaterialApp(
         scaffoldMessengerKey: _scaffoldKey,
@@ -27,10 +35,27 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: black,
         ),
-        routes: routes,
+        onGenerateRoute: _handleRoutes,
+        // routes: routes,
         initialRoute: SplashScreen.route,
         // home: SplashScreen(),
       ),
     );
+  }
+
+  Route? _handleRoutes(RouteSettings settings) {
+    final args = settings.arguments;
+    switch (settings.name) {
+      case SplashScreen.route:
+        return MaterialPageRoute(builder: (context) => SplashScreen(),);
+      case SignInScreen.route:
+        return MaterialPageRoute(builder: (context) => SignInScreen(),);
+      case SignUpScreen.route:
+        return MaterialPageRoute(builder: (context) => SignUpScreen(),);
+      case DayScreen.route:
+        return MaterialPageRoute(builder: (context) => DayScreen(),);
+      case WeatherScreen.route:
+        return MaterialPageRoute(builder: (context) => WeatherScreen(cityId: args as String,),);
+    }
   }
 }

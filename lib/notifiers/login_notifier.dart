@@ -22,7 +22,29 @@ class LoginNotifier extends ChangeNotifier {
         await SharedPref.setToken(loginRes.token??'');
         message =  loginRes.msg ?? '';
         isProgressing.value = false;
-        return true;
+        return resp["status"];
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+    isProgressing.value = false;
+    return false;
+  }
+  Future<bool> doSignUp({required String name,required String emailAddress,required String phoneNumber,required String country, required String password}) async {
+    isProgressing.value = true;
+    Map<String, dynamic> data = {
+      "name": name,
+      "email": emailAddress.trim(),
+      "phone": phoneNumber,
+      "country": country,
+      "password": password,
+    };
+    try {
+      final resp = await ApiWrapper().doPost(Cons.create_user, data, false);
+      if (resp != null && resp.isNotEmpty) {
+        message =  resp["status"]?resp["msg"]:resp["message"];
+        isProgressing.value = false;
+        return resp["status"];
       }
     } catch (e) {
       print(e.toString());

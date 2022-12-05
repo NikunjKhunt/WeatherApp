@@ -5,7 +5,7 @@ class CityRes {
       this.msg, 
       this.list,});
 
-  CityRes.fromJson(dynamic json) {
+  CityRes.fromJson(Map<String,dynamic> json) {
     msg = json['msg'];
     if (json['list'] != null) {
       list = [];
